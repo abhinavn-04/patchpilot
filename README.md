@@ -8,6 +8,7 @@ feedback.
 ## Planned capabilities
 
 - GitHub webhook verification and idempotent delivery processing
+- PostgreSQL-backed pull-request review jobs with lifecycle state and duplicate protection
 - Pull-request diff collection and source-file filtering
 - Static analysis alongside structured LLM findings
 - Confidence thresholds, deduplication, and GitHub review comments

@@ -6,7 +6,7 @@ Each item is a small, independently reviewable change.
 
 - [x] Initialize repository structure, development tooling, and project documentation.
 - [x] Add FastAPI health and readiness endpoints.
-- [ ] Add PostgreSQL models for pull-request review jobs.
+- [x] Add PostgreSQL models for pull-request review jobs.
 - [ ] Cover review-job persistence with tests.
 
 ## Week 2 — GitHub integration
