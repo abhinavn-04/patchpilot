@@ -20,8 +20,23 @@ LLM adapter. No provider credential is required until the LLM milestone.
 
 ## Development setup
 
-This repository is intentionally at its initialization stage. The first runnable API
-endpoint will be added in the next milestone.
+Run the API locally:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+Then visit:
+
+- `http://127.0.0.1:8000/health` for liveness
+- `http://127.0.0.1:8000/ready` for readiness
+- `http://127.0.0.1:8000/docs` for interactive API documentation
+
+Run the tests with:
+
+```bash
+pytest
+```
 
 ```bash
 python3 -m venv .venv

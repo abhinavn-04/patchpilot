@@ -5,7 +5,7 @@ Each item is a small, independently reviewable change.
 ## Week 1 — Foundation
 
 - [x] Initialize repository structure, development tooling, and project documentation.
-- [ ] Add FastAPI health and readiness endpoints.
+- [x] Add FastAPI health and readiness endpoints.
 - [ ] Add PostgreSQL models for pull-request review jobs.
 - [ ] Cover review-job persistence with tests.
 
