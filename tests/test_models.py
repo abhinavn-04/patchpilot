@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from sqlalchemy import create_engine
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.exc import IntegrityError
@@ -28,6 +30,36 @@ def test_review_job_defaults_to_queued_and_persists() -> None:
 
         assert review.id is not None
         assert review.status is ReviewStatus.QUEUED
+
+
+def test_review_job_persists_completion_state_and_summary() -> None:
+    engine = create_engine("sqlite+pysqlite:///:memory:")
+    Base.metadata.create_all(engine)
+
+    with Session(engine) as session:
+        review = build_review()
+        session.add(review)
+        session.commit()
+        review_id = review.id
+
+    completed_at = datetime.now(timezone.utc)
+    with Session(engine) as session:
+        review = session.get(PullRequestReview, review_id)
+        assert review is not None
+
+        review.status = ReviewStatus.COMPLETED
+        review.summary = "No blocking issues found."
+        review.completed_at = completed_at
+        session.commit()
+
+    with Session(engine) as session:
+        persisted_review = session.get(PullRequestReview, review_id)
+
+        assert persisted_review is not None
+        assert persisted_review.status is ReviewStatus.COMPLETED
+        assert persisted_review.summary == "No blocking issues found."
+        assert persisted_review.completed_at is not None
+        assert persisted_review.created_at is not None
 
 
 def test_review_job_rejects_duplicate_repository_pull_and_commit() -> None:
