@@ -24,6 +24,8 @@ LLM adapter. No provider credential is required until the LLM milestone.
 Run the API locally:
 
 ```bash
+cp .env.example .env
+# Set GITHUB_WEBHOOK_SECRET to a long random value before using webhooks.
 uvicorn app.main:app --reload
 ```
 
@@ -32,6 +34,12 @@ Then visit:
 - `http://127.0.0.1:8000/health` for liveness
 - `http://127.0.0.1:8000/ready` for readiness
 - `http://127.0.0.1:8000/docs` for interactive API documentation
+
+## GitHub webhooks
+
+`POST /webhooks/github` validates the raw request body with GitHub's
+`X-Hub-Signature-256` HMAC-SHA256 header before accepting a delivery. The next
+milestone will persist accepted deliveries idempotently before processing them.
 
 Run the tests with:
 

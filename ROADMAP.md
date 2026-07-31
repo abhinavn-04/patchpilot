@@ -11,7 +11,7 @@ Each item is a small, independently reviewable change.
 
 ## Week 2 — GitHub integration
 
-- [ ] Verify GitHub webhook signatures.
+- [x] Verify GitHub webhook signatures.
 - [ ] Persist idempotent webhook deliveries.
 - [ ] Fetch pull-request metadata and changed files.
 - [ ] Cover duplicate and invalid webhook deliveries.
