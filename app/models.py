@@ -4,7 +4,17 @@ from datetime import datetime
 from enum import Enum
 from uuid import UUID, uuid4
 
-from sqlalchemy import CheckConstraint, DateTime, Enum as SqlEnum, String, Text, UniqueConstraint, Uuid, func
+from sqlalchemy import (
+    CheckConstraint,
+    DateTime,
+    Enum as SqlEnum,
+    LargeBinary,
+    String,
+    Text,
+    UniqueConstraint,
+    Uuid,
+    func,
+)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -51,4 +61,18 @@ class PullRequestReview(Base):
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+
+class WebhookDelivery(Base):
+    """An inbound GitHub delivery stored before downstream processing."""
+
+    __tablename__ = "webhook_deliveries"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    github_delivery_id: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    event_name: Mapped[str] = mapped_column(String(100))
+    payload: Mapped[bytes] = mapped_column(LargeBinary)
+    received_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
     )

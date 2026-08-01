@@ -26,7 +26,7 @@ Run the API locally:
 ```bash
 cp .env.example .env
 # Set GITHUB_WEBHOOK_SECRET to a long random value before using webhooks.
-uvicorn app.main:app --reload
+uvicorn --env-file .env app.main:app --reload
 ```
 
 Then visit:
@@ -39,7 +39,9 @@ Then visit:
 
 `POST /webhooks/github` validates the raw request body with GitHub's
 `X-Hub-Signature-256` HMAC-SHA256 header before accepting a delivery. The next
-milestone will persist accepted deliveries idempotently before processing them.
+step persists each verified delivery idempotently before processing it. Local
+development uses SQLite; set `DATABASE_URL` to a PostgreSQL connection URL when
+running against PostgreSQL.
 
 Run the tests with:
 

@@ -1,16 +1,29 @@
 """HTTP entry point for PatchPilot."""
 
 import os
+from contextlib import asynccontextmanager
 from typing import Annotated
 
-from fastapi import FastAPI, Header, HTTPException, Request, status
+from fastapi import Depends, FastAPI, Header, HTTPException, Request, status
+from fastapi.responses import JSONResponse
+from sqlalchemy.orm import Session
 
+from app.database import get_session, initialize_database
+from app.deliveries import record_webhook_delivery
 from app.webhooks import verify_github_signature
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    initialize_database()
+    yield
+
 
 app = FastAPI(
     title="PatchPilot",
     version="0.1.0",
     description="AI-assisted GitHub pull-request review service.",
+    lifespan=lifespan,
 )
 
 
@@ -33,7 +46,10 @@ async def readiness_check() -> dict[str, str]:
 async def receive_github_webhook(
     request: Request,
     x_hub_signature_256: Annotated[str | None, Header()] = None,
-) -> dict[str, str]:
+    x_github_delivery: Annotated[str | None, Header()] = None,
+    x_github_event: Annotated[str | None, Header()] = None,
+    session: Session = Depends(get_session),
+) -> JSONResponse:
     """Accept a GitHub delivery only after its signature is verified."""
     webhook_secret = os.getenv("GITHUB_WEBHOOK_SECRET")
     if not webhook_secret:
@@ -42,8 +58,9 @@ async def receive_github_webhook(
             detail="GitHub webhook secret is not configured.",
         )
 
+    payload = await request.body()
     if not verify_github_signature(
-        payload=await request.body(),
+        payload=payload,
         signature=x_hub_signature_256,
         secret=webhook_secret,
     ):
@@ -52,4 +69,25 @@ async def receive_github_webhook(
             detail="GitHub webhook signature is invalid.",
         )
 
-    return {"status": "accepted"}
+    if not x_github_delivery or not x_github_event:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="GitHub delivery and event headers are required.",
+        )
+
+    is_new_delivery = record_webhook_delivery(
+        session,
+        delivery_id=x_github_delivery,
+        event_name=x_github_event,
+        payload=payload,
+    )
+    if not is_new_delivery:
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={"status": "duplicate", "delivery_id": x_github_delivery},
+        )
+
+    return JSONResponse(
+        status_code=status.HTTP_202_ACCEPTED,
+        content={"status": "accepted", "delivery_id": x_github_delivery},
+    )
