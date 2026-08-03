@@ -116,6 +116,27 @@ def test_webhook_endpoint_rejects_invalid_signature(monkeypatch, webhook_databas
     )
 
     assert response.status_code == 403
+    with webhook_database() as session:
+        assert session.query(WebhookDelivery).count() == 0
+
+
+def test_webhook_endpoint_requires_delivery_metadata(monkeypatch, webhook_database) -> None:
+    secret = "test-secret"
+    payload = b'{"action":"opened"}'
+    monkeypatch.setenv("GITHUB_WEBHOOK_SECRET", secret)
+
+    response = client.post(
+        "/webhooks/github",
+        content=payload,
+        headers={
+            "X-Hub-Signature-256": github_signature(payload, secret),
+            "X-GitHub-Delivery": "delivery-123",
+        },
+    )
+
+    assert response.status_code == 400
+    with webhook_database() as session:
+        assert session.query(WebhookDelivery).count() == 0
 
 
 def test_webhook_endpoint_requires_configured_secret(monkeypatch, webhook_database) -> None:
