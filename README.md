@@ -43,6 +43,11 @@ step persists each verified delivery idempotently before processing it. Local
 development uses SQLite; set `DATABASE_URL` to a PostgreSQL connection URL when
 running against PostgreSQL.
 
+The GitHub API client uses `GITHUB_TOKEN` to fetch pull-request metadata and
+every changed file, including paginated results. Use a GitHub App or a
+fine-grained token with read access to pull requests; the token is not needed
+for the local test suite.
+
 Run the tests with:
 
 ```bash

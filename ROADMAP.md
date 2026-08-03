@@ -13,7 +13,7 @@ Each item is a small, independently reviewable change.
 
 - [x] Verify GitHub webhook signatures.
 - [x] Persist idempotent webhook deliveries.
-- [ ] Fetch pull-request metadata and changed files.
+- [x] Fetch pull-request metadata and changed files.
 - [ ] Cover duplicate and invalid webhook deliveries.
 
 ## Week 3 — Deterministic review pipeline
