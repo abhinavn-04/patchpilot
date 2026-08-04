@@ -55,6 +55,10 @@ skips deleted files, files without a GitHub patch, lockfiles, build output,
 vendored dependencies, generated protobuf code, source maps, and binary files.
 Additional language support can be added without weakening these guardrails.
 
+It inspects only newly added Python lines and emits raw signals for `eval`/`exec`,
+`subprocess` calls using `shell=True`, literal credential assignments, and bare
+`except` blocks. Severity normalization is intentionally a separate upcoming stage.
+
 Run the tests with:
 
 ```bash
