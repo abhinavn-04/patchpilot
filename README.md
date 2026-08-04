@@ -48,6 +48,13 @@ every changed file, including paginated results. Use a GitHub App or a
 fine-grained token with read access to pull requests; the token is not needed
 for the local test suite.
 
+## Review scope
+
+The first deterministic review stage accepts Python (`.py`) diffs only. It
+skips deleted files, files without a GitHub patch, lockfiles, build output,
+vendored dependencies, generated protobuf code, source maps, and binary files.
+Additional language support can be added without weakening these guardrails.
+
 Run the tests with:
 
 ```bash
