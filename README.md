@@ -57,7 +57,9 @@ Additional language support can be added without weakening these guardrails.
 
 It inspects only newly added Python lines and emits raw signals for `eval`/`exec`,
 `subprocess` calls using `shell=True`, literal credential assignments, and bare
-`except` blocks. Severity normalization is intentionally a separate upcoming stage.
+`except` blocks. Signals are normalized into review findings: command-execution and
+credential risks are `high`, bare exceptions are `medium`, and unknown future rules
+default to `low` until explicitly classified.
 
 Run the tests with:
 
