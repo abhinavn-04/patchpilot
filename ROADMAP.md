@@ -21,7 +21,7 @@ Each item is a small, independently reviewable change.
 - [x] Filter generated and unsupported files.
 - [x] Add a Python static-analysis review stage.
 - [x] Normalize findings with severity levels.
-- [ ] Document local webhook testing.
+- [x] Document local webhook testing.
 
 ## Week 4 — LLM review
 
