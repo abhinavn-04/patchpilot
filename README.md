@@ -92,6 +92,10 @@ It inspects only newly added Python lines and emits raw signals for `eval`/`exec
 credential risks are `high`, bare exceptions are `medium`, and unknown future rules
 default to `low` until explicitly classified.
 
+LLM review uses a provider-independent interface. The core service passes bounded
+pull-request context, reviewable files, and normalized static findings to an adapter;
+the default adapter raises a configuration error and never makes a network call.
+
 Run the tests with:
 
 ```bash
