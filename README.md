@@ -95,6 +95,9 @@ default to `low` until explicitly classified.
 LLM review uses a provider-independent interface. The core service passes bounded
 pull-request context, reviewable files, and normalized static findings to an adapter;
 the default adapter raises a configuration error and never makes a network call.
+Provider responses must be JSON with a `findings` array. Each finding is validated
+against changed-file paths, a positive line number, `low`/`medium`/`high` severity,
+and a confidence score from 0 to 1 before it can enter the pipeline.
 
 Run the tests with:
 
