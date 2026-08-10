@@ -4,7 +4,12 @@ import pytest
 
 from app.findings import ReviewFinding, Severity
 from app.github import ChangedFile, PullRequestContext
-from app.reviewer import LLMReviewRequest, ReviewerNotConfiguredError, UnconfiguredLLMReviewer
+from app.reviewer import (
+    FakeLLMReviewer,
+    LLMReviewRequest,
+    ReviewerNotConfiguredError,
+    UnconfiguredLLMReviewer,
+)
 
 
 def _review_request() -> LLMReviewRequest:
@@ -44,3 +49,13 @@ def test_review_request_keeps_bounded_review_context() -> None:
 def test_unconfigured_reviewer_never_calls_a_provider() -> None:
     with pytest.raises(ReviewerNotConfiguredError, match="No LLM reviewer is configured"):
         asyncio.run(UnconfiguredLLMReviewer().review(_review_request()))
+
+
+def test_fake_reviewer_returns_configured_response_and_records_request() -> None:
+    request = _review_request()
+    reviewer = FakeLLMReviewer('{"findings": [{"rule_id": "demo"}]}')
+
+    response = asyncio.run(reviewer.review(request))
+
+    assert response == '{"findings": [{"rule_id": "demo"}]}'
+    assert reviewer.requests == [request]

@@ -35,3 +35,15 @@ class UnconfiguredLLMReviewer:
         raise ReviewerNotConfiguredError(
             "No LLM reviewer is configured. Install a provider adapter before requesting AI review."
         )
+
+
+class FakeLLMReviewer:
+    """Deterministic in-memory reviewer for tests and local demos."""
+
+    def __init__(self, response: str = '{"findings": []}') -> None:
+        self._response = response
+        self.requests: list[LLMReviewRequest] = []
+
+    async def review(self, request: LLMReviewRequest) -> str:
+        self.requests.append(request)
+        return self._response

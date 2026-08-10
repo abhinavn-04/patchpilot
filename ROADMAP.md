@@ -27,7 +27,7 @@ Each item is a small, independently reviewable change.
 
 - [x] Add a provider-agnostic LLM reviewer interface.
 - [x] Validate structured LLM findings.
-- [ ] Add a fake LLM reviewer for deterministic tests.
+- [x] Add a fake LLM reviewer for deterministic tests.
 - [ ] Redact likely secrets before external review.
 
 ## Week 5 — Feedback publishing
