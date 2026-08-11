@@ -32,7 +32,7 @@ Each item is a small, independently reviewable change.
 
 ## Week 5 — Feedback publishing
 
-- [ ] Deduplicate and confidence-rank findings.
+- [x] Deduplicate and confidence-rank findings.
 - [ ] Publish high-confidence findings to GitHub pull requests.
 - [ ] Add a review-summary endpoint.
 - [ ] Test GitHub review-comment publishing.
