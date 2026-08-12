@@ -70,6 +70,30 @@ class GitHubClient:
             changed_files=tuple(changed_files),
         )
 
+    async def create_pull_request_review_comment(
+        self,
+        *,
+        repository: str,
+        pull_number: int,
+        commit_sha: str,
+        filename: str,
+        line: int,
+        body: str,
+    ) -> int:
+        """Create a line-level review comment and return its GitHub comment ID."""
+        response = await self._client.post(
+            f"/repos/{repository}/pulls/{pull_number}/comments",
+            json={
+                "body": body,
+                "commit_id": commit_sha,
+                "path": filename,
+                "line": line,
+                "side": "RIGHT",
+            },
+        )
+        response.raise_for_status()
+        return int(response.json()["id"])
+
     async def _fetch_changed_files(
         self, repository: str, pull_number: int
     ) -> list[ChangedFile]:
