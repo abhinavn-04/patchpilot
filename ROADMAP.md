@@ -34,7 +34,7 @@ Each item is a small, independently reviewable change.
 
 - [x] Deduplicate and confidence-rank findings.
 - [x] Publish high-confidence findings to GitHub pull requests.
-- [ ] Add a review-summary endpoint.
+- [x] Add a review-summary endpoint.
 - [ ] Test GitHub review-comment publishing.
 
 ## Week 6 — Portfolio finish

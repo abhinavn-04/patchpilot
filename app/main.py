@@ -2,14 +2,18 @@
 
 import os
 from contextlib import asynccontextmanager
+from datetime import datetime
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, status
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.database import get_session, initialize_database
 from app.deliveries import record_webhook_delivery
+from app.models import PullRequestReview, ReviewStatus
 from app.webhooks import verify_github_signature
 
 
@@ -27,6 +31,20 @@ app = FastAPI(
 )
 
 
+class ReviewSummaryResponse(BaseModel):
+    """Safe, durable status information for a pull-request review job."""
+
+    id: UUID
+    repository: str
+    pull_number: int
+    head_sha: str
+    status: ReviewStatus
+    summary: str | None
+    completed_at: datetime | None
+    created_at: datetime
+    updated_at: datetime
+
+
 @app.get("/health", tags=["operations"])
 async def health_check() -> dict[str, str]:
     """Report that the HTTP process is running."""
@@ -40,6 +58,29 @@ async def readiness_check() -> dict[str, str]:
     Dependency checks will be added alongside PostgreSQL and Redis integration.
     """
     return {"status": "ready"}
+
+
+@app.get("/reviews/{review_id}", response_model=ReviewSummaryResponse, tags=["reviews"])
+def get_review_summary(
+    review_id: UUID,
+    session: Session = Depends(get_session),
+) -> ReviewSummaryResponse:
+    """Return the durable status and summary for one pull-request review job."""
+    review = session.get(PullRequestReview, review_id)
+    if review is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Review job was not found.")
+
+    return ReviewSummaryResponse(
+        id=review.id,
+        repository=review.repository_full_name,
+        pull_number=review.pull_number,
+        head_sha=review.head_sha,
+        status=review.status,
+        summary=review.summary,
+        completed_at=review.completed_at,
+        created_at=review.created_at,
+        updated_at=review.updated_at,
+    )
 
 
 @app.post("/webhooks/github", status_code=status.HTTP_202_ACCEPTED, tags=["webhooks"])
