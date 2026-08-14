@@ -1,4 +1,5 @@
 import asyncio
+import json
 
 import httpx
 import pytest
@@ -88,3 +89,60 @@ def test_client_propagates_github_api_errors() -> None:
 
     with pytest.raises(httpx.HTTPStatusError):
         asyncio.run(fetch_missing_pull_request())
+
+
+def test_client_posts_line_level_pull_request_review_comment() -> None:
+    requests: list[httpx.Request] = []
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        return httpx.Response(201, json={"id": 987})
+
+    async def create_comment() -> int:
+        client = GitHubClient("test-token", transport=httpx.MockTransport(handler))
+        try:
+            return await client.create_pull_request_review_comment(
+                repository="acme/patchpilot",
+                pull_number=42,
+                commit_sha="head-sha",
+                filename="app/service.py",
+                line=12,
+                body="Review comment",
+            )
+        finally:
+            await client.aclose()
+
+    assert asyncio.run(create_comment()) == 987
+    assert len(requests) == 1
+    assert requests[0].method == "POST"
+    assert requests[0].url.path == "/repos/acme/patchpilot/pulls/42/comments"
+    assert requests[0].headers["Authorization"] == "Bearer test-token"
+    assert json.loads(requests[0].content) == {
+        "body": "Review comment",
+        "commit_id": "head-sha",
+        "path": "app/service.py",
+        "line": 12,
+        "side": "RIGHT",
+    }
+
+
+def test_client_propagates_review_comment_api_errors() -> None:
+    async def handler(_: httpx.Request) -> httpx.Response:
+        return httpx.Response(422, json={"message": "Line must be part of the diff"})
+
+    async def create_comment() -> None:
+        client = GitHubClient("test-token", transport=httpx.MockTransport(handler))
+        try:
+            await client.create_pull_request_review_comment(
+                repository="acme/patchpilot",
+                pull_number=42,
+                commit_sha="head-sha",
+                filename="app/service.py",
+                line=12,
+                body="Review comment",
+            )
+        finally:
+            await client.aclose()
+
+    with pytest.raises(httpx.HTTPStatusError):
+        asyncio.run(create_comment())

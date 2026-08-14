@@ -78,3 +78,21 @@ def test_publish_high_confidence_findings_rejects_invalid_threshold() -> None:
 
 def test_default_threshold_is_high_confidence() -> None:
     assert HIGH_CONFIDENCE_THRESHOLD == 0.80
+
+
+def test_publish_high_confidence_findings_skips_github_when_none_qualify() -> None:
+    async def handler(_: httpx.Request) -> httpx.Response:
+        raise AssertionError("GitHub must not be called for low-confidence findings")
+
+    async def publish():
+        client = GitHubClient("test-token", transport=httpx.MockTransport(handler))
+        try:
+            return await publish_high_confidence_findings(
+                client=client,
+                pull_request=_pull_request(),
+                findings=(_finding("Low confidence", 0.79),),
+            )
+        finally:
+            await client.aclose()
+
+    assert asyncio.run(publish()) == ()
