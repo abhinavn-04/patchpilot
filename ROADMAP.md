@@ -40,6 +40,6 @@ Each item is a small, independently reviewable change.
 ## Week 6 — Portfolio finish
 
 - [x] Add a Docker development environment.
-- [ ] Add test and lint CI.
+- [x] Add test and lint CI.
 - [ ] Add an architecture diagram and demo walkthrough.
 - [ ] Prepare the repository for portfolio use.

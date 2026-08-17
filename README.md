@@ -128,6 +128,9 @@ python -m pip install --upgrade pip
 python -m pip install -e '.[dev]'
 ```
 
+GitHub Actions runs Ruff and the full pytest suite for every pull request and
+push to `main`.
+
 ## Roadmap
 
 See [ROADMAP.md](ROADMAP.md) for commit-sized milestones.
