@@ -1,0 +1,12 @@
+services:
+  patchpilot:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: sqlite:////data/patchpilot.db
+    volumes:
+      - patchpilot_data:/data
+
+volumes:
+  patchpilot_data:

@@ -35,6 +35,22 @@ Then visit:
 - `http://127.0.0.1:8000/ready` for readiness
 - `http://127.0.0.1:8000/docs` for interactive API documentation
 
+### Docker development
+
+Run the service with a persistent local SQLite database:
+
+```bash
+docker compose up --build
+```
+
+Then open `http://127.0.0.1:8000/docs`. The container runs as a non-root user;
+the named `patchpilot_data` volume keeps the local database between restarts.
+Set `GITHUB_WEBHOOK_SECRET` only when testing webhook delivery, for example:
+
+```bash
+GITHUB_WEBHOOK_SECRET='local-only-secret' docker compose up --build
+```
+
 ## GitHub webhooks
 
 `POST /webhooks/github` validates the raw request body with GitHub's
