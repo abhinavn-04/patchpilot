@@ -39,7 +39,11 @@ def test_client_fetches_pull_request_metadata_and_all_changed_files() -> None:
         return httpx.Response(
             200,
             headers={
-                "Link": "<https://api.github.com/repos/acme/patchpilot/pulls/42/files?page=2&per_page=100>; rel=\"next\""
+                "Link": (
+                    "<https://api.github.com/repos/acme/patchpilot/pulls/42/files?"
+                    "page=2&per_page=100>; "
+                    'rel="next"'
+                )
             },
             json=[
                 {

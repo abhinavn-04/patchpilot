@@ -1,7 +1,7 @@
 """Strict validation for structured findings returned by LLM review adapters."""
 
-from dataclasses import dataclass
 import json
+from dataclasses import dataclass
 
 from app.findings import Severity
 from app.github import ChangedFile
@@ -59,7 +59,11 @@ def _validate_finding(item: object, allowed_files: set[str]) -> LLMFinding:
         raise LLMFindingValidationError("LLM finding line must be a positive integer.")
     if not isinstance(severity, str) or severity not in Severity:
         raise LLMFindingValidationError("LLM finding severity must be low, medium, or high.")
-    if not isinstance(confidence, (int, float)) or isinstance(confidence, bool) or not 0 <= confidence <= 1:
+    if (
+        not isinstance(confidence, (int, float))
+        or isinstance(confidence, bool)
+        or not 0 <= confidence <= 1
+    ):
         raise LLMFindingValidationError("LLM finding confidence must be between 0 and 1.")
     if not isinstance(title, str) or not title.strip():
         raise LLMFindingValidationError("LLM finding title must be non-empty text.")

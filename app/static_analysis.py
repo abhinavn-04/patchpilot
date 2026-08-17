@@ -1,7 +1,7 @@
 """Deterministic checks for newly added Python pull-request lines."""
 
-from dataclasses import dataclass
 import re
+from dataclasses import dataclass
 
 from app.github import ChangedFile
 

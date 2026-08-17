@@ -10,7 +10,11 @@ def _changed_files() -> tuple[ChangedFile, ...]:
 
 def test_validator_returns_typed_structured_findings() -> None:
     findings = validate_llm_findings(
-        '''{"findings":[{"filename":"app/reviewer.py","line":8,"severity":"high","confidence":0.9,"title":"Unsafe review path","message":"Validate provider output before publishing it."}]}''',
+        (
+            '{"findings":[{"filename":"app/reviewer.py","line":8,'
+            '"severity":"high","confidence":0.9,"title":"Unsafe review path",'
+            '"message":"Validate provider output before publishing it."}]}'
+        ),
         _changed_files(),
     )
 
@@ -24,10 +28,34 @@ def test_validator_returns_typed_structured_findings() -> None:
     [
         ("not-json", "valid JSON"),
         ('{"findings": {}}', "must be an array"),
-        ('{"findings":[{"filename":"README.md","line":1,"severity":"low","confidence":0.2,"title":"Title","message":"Message"}]}', "changed file"),
-        ('{"findings":[{"filename":"app/reviewer.py","line":0,"severity":"low","confidence":0.2,"title":"Title","message":"Message"}]}', "positive integer"),
-        ('{"findings":[{"filename":"app/reviewer.py","line":1,"severity":"urgent","confidence":0.2,"title":"Title","message":"Message"}]}', "low, medium, or high"),
-        ('{"findings":[{"filename":"app/reviewer.py","line":1,"severity":"low","confidence":1.1,"title":"Title","message":"Message"}]}', "between 0 and 1"),
+        (
+            (
+                '{"findings":[{"filename":"README.md","line":1,"severity":"low",'
+                '"confidence":0.2,"title":"Title","message":"Message"}]}'
+            ),
+            "changed file",
+        ),
+        (
+            (
+                '{"findings":[{"filename":"app/reviewer.py","line":0,"severity":"low",'
+                '"confidence":0.2,"title":"Title","message":"Message"}]}'
+            ),
+            "positive integer",
+        ),
+        (
+            (
+                '{"findings":[{"filename":"app/reviewer.py","line":1,"severity":"urgent",'
+                '"confidence":0.2,"title":"Title","message":"Message"}]}'
+            ),
+            "low, medium, or high",
+        ),
+        (
+            (
+                '{"findings":[{"filename":"app/reviewer.py","line":1,"severity":"low",'
+                '"confidence":1.1,"title":"Title","message":"Message"}]}'
+            ),
+            "between 0 and 1",
+        ),
     ],
 )
 def test_validator_rejects_invalid_provider_findings(response: str, message: str) -> None:

@@ -51,7 +51,10 @@ def test_publish_high_confidence_findings_posts_only_qualified_findings() -> Non
     assert requests[0].method == "POST"
     assert requests[0].url.path == "/repos/acme/patchpilot/pulls/42/comments"
     assert json.loads(requests[0].content) == {
-        "body": "**[HIGH] Validate input** (confidence: 91%)\n\nValidate the request before processing it.",
+        "body": (
+            "**[HIGH] Validate input** (confidence: 91%)\n\n"
+            "Validate the request before processing it."
+        ),
         "commit_id": "head-sha",
         "path": "app/service.py",
         "line": 12,

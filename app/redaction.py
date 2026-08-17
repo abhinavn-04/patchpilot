@@ -3,7 +3,7 @@
 import re
 
 from app.github import ChangedFile
-from app.reviewer import LLMReviewRequest, LLMReviewer
+from app.reviewer import LLMReviewer, LLMReviewRequest
 
 _REDACTED = "[REDACTED]"
 _ASSIGNMENT = re.compile(

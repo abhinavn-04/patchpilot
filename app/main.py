@@ -68,7 +68,10 @@ def get_review_summary(
     """Return the durable status and summary for one pull-request review job."""
     review = session.get(PullRequestReview, review_id)
     if review is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Review job was not found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Review job was not found.",
+        )
 
     return ReviewSummaryResponse(
         id=review.id,

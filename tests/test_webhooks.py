@@ -4,7 +4,7 @@ import hmac
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.database import get_session
@@ -41,7 +41,9 @@ def webhook_database():
     engine.dispose()
 
 
-def github_headers(payload: bytes, secret: str, delivery_id: str = "delivery-123") -> dict[str, str]:
+def github_headers(
+    payload: bytes, secret: str, delivery_id: str = "delivery-123"
+) -> dict[str, str]:
     return {
         "X-Hub-Signature-256": github_signature(payload, secret),
         "X-GitHub-Delivery": delivery_id,

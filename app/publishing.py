@@ -46,4 +46,7 @@ async def publish_high_confidence_findings(
 
 def _format_comment(finding: LLMFinding) -> str:
     percentage = round(finding.confidence * 100)
-    return f"**[{finding.severity.upper()}] {finding.title}** (confidence: {percentage}%)\n\n{finding.message}"
+    return (
+        f"**[{finding.severity.upper()}] {finding.title}** (confidence: {percentage}%)\n\n"
+        f"{finding.message}"
+    )
