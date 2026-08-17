@@ -134,3 +134,6 @@ push to `main`.
 ## Roadmap
 
 See [ROADMAP.md](ROADMAP.md) for commit-sized milestones.
+
+For the component diagram and a safe local demonstration, see
+[Architecture and demo walkthrough](docs/architecture.md).
