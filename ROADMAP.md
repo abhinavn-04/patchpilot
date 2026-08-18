@@ -42,4 +42,4 @@ Each item is a small, independently reviewable change.
 - [x] Add a Docker development environment.
 - [x] Add test and lint CI.
 - [x] Add an architecture diagram and demo walkthrough.
-- [ ] Prepare the repository for portfolio use.
+- [x] Prepare the repository for portfolio use.

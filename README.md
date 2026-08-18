@@ -1,18 +1,29 @@
 # PatchPilot
 
-PatchPilot is a Python service that reviews GitHub pull requests using deterministic
-static checks and bounded LLM analysis. It will validate webhook deliveries, process
-only relevant changed files, and publish high-confidence findings as actionable PR
-feedback.
+PatchPilot is a Python/FastAPI backend for safe, reviewable GitHub pull-request
+analysis. It verifies webhook deliveries, gathers typed pull-request context, applies
+deterministic checks, validates bounded LLM findings, and prepares high-confidence
+inline feedback for GitHub.
 
-## Planned capabilities
+## Portfolio highlights
 
-- GitHub webhook verification and idempotent delivery processing
-- PostgreSQL-backed pull-request review jobs with lifecycle state and duplicate protection
-- Pull-request diff collection and source-file filtering
-- Static analysis alongside structured LLM findings
-- Confidence thresholds, deduplication, and GitHub review comments
-- PostgreSQL persistence, background workers, tests, Docker, and CI
+- Verified GitHub webhook intake using HMAC-SHA256 over untouched request bytes,
+  with idempotent delivery persistence.
+- Typed GitHub pull-request retrieval, pagination, conservative Python-file filtering,
+  and line-aware static checks for security and reliability risks.
+- Provider-independent LLM boundary with structured-output validation, deterministic
+  fake adapters, likely-secret redaction, confidence ranking, and deduplication.
+- High-confidence GitHub inline-comment publishing contract, tested entirely with
+  mock transport so local tests never post to a real pull request.
+- FastAPI health, readiness, and durable review-summary endpoints backed by SQLAlchemy.
+- Docker development environment, GitHub Actions lint/test CI, and 45 automated tests.
+
+## Current scope
+
+The repository implements and tests the components above. The production background
+worker that connects an accepted webhook to the end-to-end review-and-publish sequence
+is intentionally not implemented yet; the architecture diagram marks that boundary as
+future work. No real LLM provider or GitHub credential is required to run the tests.
 
 ## Technology direction
 
@@ -130,6 +141,16 @@ python -m pip install -e '.[dev]'
 
 GitHub Actions runs Ruff and the full pytest suite for every pull request and
 push to `main`.
+
+## Resume-ready description
+
+**PatchPilot — Python, FastAPI, SQLAlchemy, pytest, Docker, GitHub REST API**
+
+Built a secure pull-request review backend with verified and idempotent GitHub
+webhooks, typed PR-diff retrieval, deterministic Python checks, validated structured
+LLM findings, secret redaction, confidence ranking, and line-level comment publishing
+contracts. Added Docker-based local development and GitHub Actions CI with Ruff and
+pytest.
 
 ## Roadmap
 
