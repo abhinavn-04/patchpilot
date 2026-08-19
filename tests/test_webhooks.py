@@ -1,5 +1,6 @@
 import hashlib
 import hmac
+import json
 
 import pytest
 from fastapi.testclient import TestClient
@@ -9,7 +10,7 @@ from sqlalchemy.pool import StaticPool
 
 from app.database import get_session
 from app.main import app
-from app.models import Base, WebhookDelivery
+from app.models import Base, PullRequestReview, ReviewStatus, WebhookDelivery
 from app.webhooks import verify_github_signature
 
 client = TestClient(app)
@@ -51,6 +52,18 @@ def github_headers(
     }
 
 
+def pull_request_payload(*, action: str = "opened", head_sha: str = "a" * 40) -> bytes:
+    return json.dumps(
+        {
+            "action": action,
+            "number": 42,
+            "repository": {"full_name": "acme/patchpilot"},
+            "pull_request": {"head": {"sha": head_sha}},
+        },
+        separators=(",", ":"),
+    ).encode()
+
+
 def test_signature_matches_github_documented_example() -> None:
     assert verify_github_signature(
         payload=b"Hello, World!",
@@ -73,7 +86,7 @@ def test_signature_rejects_tampered_payload_and_invalid_header() -> None:
 
 def test_webhook_endpoint_accepts_valid_delivery(monkeypatch, webhook_database) -> None:
     secret = "test-secret"
-    payload = b'{"action":"opened"}'
+    payload = pull_request_payload()
     monkeypatch.setenv("GITHUB_WEBHOOK_SECRET", secret)
 
     response = client.post(
@@ -90,6 +103,36 @@ def test_webhook_endpoint_accepts_valid_delivery(monkeypatch, webhook_database) 
         assert delivery.github_delivery_id == "delivery-123"
         assert delivery.event_name == "pull_request"
         assert delivery.payload == payload
+        review = session.query(PullRequestReview).one()
+        assert review.repository_full_name == "acme/patchpilot"
+        assert review.pull_number == 42
+        assert review.head_sha == "a" * 40
+        assert review.status is ReviewStatus.QUEUED
+
+
+def test_webhook_endpoint_deduplicates_review_job_for_same_commit(
+    monkeypatch, webhook_database
+) -> None:
+    secret = "test-secret"
+    payload = pull_request_payload(action="synchronize")
+    monkeypatch.setenv("GITHUB_WEBHOOK_SECRET", secret)
+
+    first = client.post(
+        "/webhooks/github",
+        content=payload,
+        headers=github_headers(payload, secret, "delivery-123"),
+    )
+    second = client.post(
+        "/webhooks/github",
+        content=payload,
+        headers=github_headers(payload, secret, "delivery-456"),
+    )
+
+    assert first.status_code == 202
+    assert second.status_code == 202
+    with webhook_database() as session:
+        assert session.query(WebhookDelivery).count() == 2
+        assert session.query(PullRequestReview).count() == 1
 
 
 def test_webhook_endpoint_ignores_duplicate_delivery(monkeypatch, webhook_database) -> None:

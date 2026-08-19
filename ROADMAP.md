@@ -43,3 +43,10 @@ Each item is a small, independently reviewable change.
 - [x] Add test and lint CI.
 - [x] Add an architecture diagram and demo walkthrough.
 - [x] Prepare the repository for portfolio use.
+
+## Week 7 — Review execution
+
+- [x] Queue review jobs from supported pull-request webhooks.
+- [ ] Execute the deterministic review pipeline for queued jobs.
+- [ ] Connect the configured LLM reviewer and persist its summary.
+- [ ] Publish qualified findings and finalize review status.

@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 from app.database import get_session, initialize_database
 from app.deliveries import record_webhook_delivery
 from app.models import PullRequestReview, ReviewStatus
+from app.reviews import queue_pull_request_review
 from app.webhooks import verify_github_signature
 
 
@@ -130,6 +131,12 @@ async def receive_github_webhook(
             status_code=status.HTTP_200_OK,
             content={"status": "duplicate", "delivery_id": x_github_delivery},
         )
+
+    queue_pull_request_review(
+        session,
+        event_name=x_github_event,
+        payload=payload,
+    )
 
     return JSONResponse(
         status_code=status.HTTP_202_ACCEPTED,
